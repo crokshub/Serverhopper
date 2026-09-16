@@ -1,0 +1,619 @@
+-- ==========================================
+-- 💎 CROKS HOPPER V7.1 - COMPLETO
+-- ==========================================
+print("🚀 Carregando Hopper V7.1...")
+
+local TS = game:GetService("TeleportService")
+local HS = game:GetService("HttpService")
+local PL = game:GetService("Players")
+local UIS = game:GetService("UserInputService")
+local Stats = game:GetService("Stats")
+
+local IMG_ID = 120740005842911
+local IMG_URL = "rbxassetid://" .. IMG_ID
+
+local Temas = {
+    Verde    = Color3.fromRGB(0, 255, 120),
+    Roxo     = Color3.fromRGB(170, 80, 255),
+    Azul     = Color3.fromRGB(80, 160, 255),
+    Vermelho = Color3.fromRGB(255, 80, 100),
+    Dourado  = Color3.fromRGB(212, 175, 55),
+}
+local TemaAtual = "Dourado"
+local Cores = {
+    Fundo = Color3.fromRGB(10, 10, 12),
+    Painel = Color3.fromRGB(18, 18, 20),
+    Texto = Color3.fromRGB(255, 255, 255),
+    Cinza = Color3.fromRGB(150, 150, 150),
+    Amarelo = Color3.fromRGB(255, 200, 0),
+    Vermelho = Color3.fromRGB(255, 80, 80),
+}
+local function GetBorda() return Temas[TemaAtual] end
+
+local SG = Instance.new("ScreenGui")
+SG.Name = "CroksHopperV71"
+SG.ResetOnSpawn = false
+SG.IgnoreGuiInset = true
+SG.Parent = game:GetService("CoreGui")
+print("✅ ScreenGui")
+
+-- BOTÃO HOP
+local Hop = Instance.new("TextButton")
+Hop.Size = UDim2.new(0, 55, 0, 55)
+Hop.Position = UDim2.new(0, 10, 0, 170)
+Hop.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+Hop.BorderSizePixel = 0
+Hop.Text = ""
+Hop.AutoButtonColor = false
+Hop.Parent = SG
+local hc = Instance.new("UICorner") hc.CornerRadius = UDim.new(1, 0) hc.Parent = Hop
+local hs = Instance.new("UIStroke") hs.Thickness = 3 hs.Color = GetBorda() hs.Parent = Hop
+
+local HopIcon = Instance.new("ImageLabel")
+HopIcon.Size = UDim2.new(0, 48, 0, 48)
+HopIcon.Position = UDim2.new(0.5, -24, 0.5, -24)
+HopIcon.BackgroundTransparency = 1
+HopIcon.Image = IMG_URL
+HopIcon.ScaleType = Enum.ScaleType.Fit
+HopIcon.Parent = Hop
+local hic = Instance.new("UICorner") hic.CornerRadius = UDim.new(1, 0) hic.Parent = HopIcon
+
+-- PAINEL
+local MF = Instance.new("Frame")
+MF.Size = UDim2.new(0, 300, 0, 400)
+MF.Position = UDim2.new(0.5, -150, 0.5, -200)
+MF.BackgroundColor3 = Cores.Fundo
+MF.BorderSizePixel = 0
+MF.Visible = true
+MF.Active = true
+MF.Parent = SG
+local mc = Instance.new("UICorner") mc.CornerRadius = UDim.new(0, 10) mc.Parent = MF
+local ms = Instance.new("UIStroke") ms.Thickness = 1.5 ms.Color = GetBorda() ms.Parent = MF
+
+-- HEADER
+local HD = Instance.new("Frame")
+HD.Size = UDim2.new(1, 0, 0, 36)
+HD.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+HD.BorderSizePixel = 0
+HD.Active = true
+HD.Parent = MF
+local hdc = Instance.new("UICorner") hdc.CornerRadius = UDim.new(0, 10) hdc.Parent = HD
+
+local HeaderIcon = Instance.new("ImageLabel")
+HeaderIcon.Size = UDim2.new(0, 26, 0, 26)
+HeaderIcon.Position = UDim2.new(0, 6, 0, 5)
+HeaderIcon.BackgroundTransparency = 1
+HeaderIcon.Image = IMG_URL
+HeaderIcon.ScaleType = Enum.ScaleType.Fit
+HeaderIcon.Parent = HD
+local hico = Instance.new("UICorner") hico.CornerRadius = UDim.new(1, 0) hico.Parent = HeaderIcon
+
+local TT = Instance.new("TextLabel")
+TT.Size = UDim2.new(1, -140, 1, 0)
+TT.Position = UDim2.new(0, 40, 0, 0)
+TT.Text = "CROKS HOPPER"
+TT.TextColor3 = GetBorda()
+TT.TextSize = 12
+TT.Font = Enum.Font.GothamBlack
+TT.TextXAlignment = Enum.TextXAlignment.Left
+TT.BackgroundTransparency = 1
+TT.Parent = HD
+
+local MinBtn = Instance.new("TextButton")
+MinBtn.Size = UDim2.new(0, 22, 0, 22)
+MinBtn.Position = UDim2.new(1, -54, 0, 7)
+MinBtn.Text = "—"
+MinBtn.TextColor3 = GetBorda()
+MinBtn.TextSize = 14
+MinBtn.Font = Enum.Font.GothamBold
+MinBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+MinBtn.BorderSizePixel = 0
+MinBtn.Parent = HD
+local minc = Instance.new("UICorner") minc.CornerRadius = UDim.new(1, 0) minc.Parent = MinBtn
+
+local XB = Instance.new("TextButton")
+XB.Size = UDim2.new(0, 22, 0, 22)
+XB.Position = UDim2.new(1, -28, 0, 7)
+XB.Text = "X"
+XB.TextColor3 = Cores.Vermelho
+XB.TextSize = 12
+XB.Font = Enum.Font.GothamBold
+XB.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+XB.BorderSizePixel = 0
+XB.Parent = HD
+local xc = Instance.new("UICorner") xc.CornerRadius = UDim.new(1, 0) xc.Parent = XB
+
+-- DRAG
+local dragging, dragInput, dragStart, startPos
+HD.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = MF.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then dragging = false end
+        end)
+    end
+end)
+HD.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+UIS.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        MF.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+                                 startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- TABS
+local TB = Instance.new("Frame")
+TB.Size = UDim2.new(1, -12, 0, 26)
+TB.Position = UDim2.new(0, 6, 0, 42)
+TB.BackgroundTransparency = 1
+TB.Parent = MF
+
+local function mkTab(txt, x, w)
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(0, w, 1, 0)
+    b.Position = UDim2.new(0, x, 0, 0)
+    b.Text = txt
+    b.TextColor3 = Cores.Texto
+    b.TextSize = 9
+    b.Font = Enum.Font.GothamBold
+    b.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
+    b.BorderSizePixel = 0
+    b.Parent = TB
+    local c = Instance.new("UICorner") c.CornerRadius = UDim.new(0, 5) c.Parent = b
+    return b
+end
+
+local T1 = mkTab("🌐 Servers", 0, 68)
+local T2 = mkTab("⭐ Favs", 71, 56)
+local T3 = mkTab("🕐 Hist", 130, 56)
+local T4 = mkTab("⚙️ Config", 189, 60)
+local T5 = mkTab("🎨", 252, 30)
+
+local function mkCont()
+    local f = Instance.new("Frame")
+    f.Size = UDim2.new(1, -12, 1, -108)
+    f.Position = UDim2.new(0, 6, 0, 74)
+    f.BackgroundColor3 = Color3.fromRGB(15, 15, 18)
+    f.BorderSizePixel = 0
+    f.Visible = false
+    f.Parent = MF
+    local c = Instance.new("UICorner") c.CornerRadius = UDim.new(0, 6) c.Parent = f
+    return f
+end
+
+local C1 = mkCont()
+local C2 = mkCont()
+local C3 = mkCont()
+local C4 = mkCont()
+local C5 = mkCont()
+
+-- ABA SERVERS
+local BH = Instance.new("TextButton")
+BH.Size = UDim2.new(0.5, -4, 0, 28)
+BH.Position = UDim2.new(0, 4, 0, 4)
+BH.Text = "🎯 Best Hop"
+BH.TextColor3 = Color3.fromRGB(0, 0, 0)
+BH.TextSize = 10
+BH.Font = Enum.Font.GothamBold
+BH.BackgroundColor3 = GetBorda()
+BH.BorderSizePixel = 0
+BH.Parent = C1
+local bhc = Instance.new("UICorner") bhc.CornerRadius = UDim.new(0, 5) bhc.Parent = BH
+
+local RB = Instance.new("TextButton")
+RB.Size = UDim2.new(0.5, -4, 0, 28)
+RB.Position = UDim2.new(0.5, 0, 0, 4)
+RB.Text = "🔄 Atualizar"
+RB.TextColor3 = Cores.Texto
+RB.TextSize = 10
+RB.Font = Enum.Font.GothamBold
+RB.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+RB.BorderSizePixel = 0
+RB.Parent = C1
+local rbc = Instance.new("UICorner") rbc.CornerRadius = UDim.new(0, 5) rbc.Parent = RB
+
+-- Filtro players
+local FF = Instance.new("Frame")
+FF.Size = UDim2.new(1, -8, 0, 28)
+FF.Position = UDim2.new(0, 4, 0, 36)
+FF.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
+FF.BorderSizePixel = 0
+FF.Parent = C1
+local ffc = Instance.new("UICorner") ffc.CornerRadius = UDim.new(0, 5) ffc.Parent = FF
+
+local FLbl = Instance.new("TextLabel")
+FLbl.Size = UDim2.new(0, 50, 1, 0)
+FLbl.Position = UDim2.new(0, 4, 0, 0)
+FLbl.Text = "Players:"
+FLbl.TextColor3 = Cores.Cinza
+FLbl.TextSize = 9
+FLbl.Font = Enum.Font.GothamBold
+FLbl.TextXAlignment = Enum.TextXAlignment.Left
+FLbl.BackgroundTransparency = 1
+FLbl.Parent = FF
+
+local MinI = Instance.new("TextBox")
+MinI.Size = UDim2.new(0, 26, 0, 18)
+MinI.Position = UDim2.new(0, 55, 0, 5)
+MinI.Text = "0"
+MinI.TextColor3 = Cores.Texto
+MinI.TextSize = 10
+MinI.Font = Enum.Font.GothamBold
+MinI.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+MinI.BorderSizePixel = 0
+MinI.ClearTextOnFocus = false
+MinI.Parent = FF
+local mic = Instance.new("UICorner") mic.CornerRadius = UDim.new(0, 4) mic.Parent = MinI
+
+local MaxI = Instance.new("TextBox")
+MaxI.Size = UDim2.new(0, 30, 0, 18)
+MaxI.Position = UDim2.new(0, 100, 0, 5)
+MaxI.Text = "100"
+MaxI.TextColor3 = Cores.Texto
+MaxI.TextSize = 10
+MaxI.Font = Enum.Font.GothamBold
+MaxI.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+MaxI.BorderSizePixel = 0
+MaxI.ClearTextOnFocus = false
+MaxI.Parent = FF
+local mac = Instance.new("UICorner") mac.CornerRadius = UDim.new(0, 4) mac.Parent = MaxI
+
+local ApBtn = Instance.new("TextButton")
+ApBtn.Size = UDim2.new(0, 55, 0, 18)
+ApBtn.Position = UDim2.new(1, -60, 0, 5)
+ApBtn.Text = "Aplicar"
+ApBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+ApBtn.TextSize = 9
+ApBtn.Font = Enum.Font.GothamBold
+ApBtn.BackgroundColor3 = GetBorda()
+ApBtn.BorderSizePixel = 0
+ApBtn.Parent = FF
+local abc = Instance.new("UICorner") abc.CornerRadius = UDim.new(0, 4) abc.Parent = ApBtn
+
+-- Filtros rápidos
+local QF = Instance.new("Frame")
+QF.Size = UDim2.new(1, -8, 0, 22)
+QF.Position = UDim2.new(0, 4, 0, 68)
+QF.BackgroundTransparency = 1
+QF.Parent = C1
+
+local OrdemAtual = "asc"
+local buscar
+
+local function mkQuick(texto, x, w, ordem)
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(0, w, 1, 0)
+    b.Position = UDim2.new(0, x, 0, 0)
+    b.Text = texto
+    b.TextColor3 = Cores.Texto
+    b.TextSize = 8
+    b.Font = Enum.Font.GothamBold
+    b.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+    b.BorderSizePixel = 0
+    b.Parent = QF
+    local c = Instance.new("UICorner") c.CornerRadius = UDim.new(0, 4) c.Parent = b
+    b.MouseButton1Click:Connect(function()
+        for _, v in pairs(QF:GetChildren()) do
+            if v:IsA("TextButton") then
+                v.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+                v.TextColor3 = Cores.Texto
+            end
+        end
+        b.BackgroundColor3 = GetBorda()
+        b.TextColor3 = Color3.fromRGB(0, 0, 0)
+        OrdemAtual = ordem
+        if buscar then buscar() end
+    end)
+    return b
+end
+
+mkQuick("⬆ Menor", 0, 85, "asc")
+mkQuick("⬇ Maior", 88, 85, "desc")
+mkQuick("🐣 Pequenos", 176, 106, "small")
+
+-- Auto Refresh
+local ARRow = Instance.new("Frame")
+ARRow.Size = UDim2.new(1, -8, 0, 18)
+ARRow.Position = UDim2.new(0, 4, 0, 92)
+ARRow.BackgroundTransparency = 1
+ARRow.Parent = C1
+
+local ST = Instance.new("TextLabel")
+ST.Size = UDim2.new(1, -70, 1, 0)
+ST.Text = "Clique em Atualizar."
+ST.TextColor3 = Cores.Cinza
+ST.TextSize = 9
+ST.Font = Enum.Font.Gotham
+ST.TextXAlignment = Enum.TextXAlignment.Left
+ST.BackgroundTransparency = 1
+ST.Parent = ARRow
+
+local AutoRefreshOn = false
+local ARBtn = Instance.new("TextButton")
+ARBtn.Size = UDim2.new(0, 62, 1, 0)
+ARBtn.Position = UDim2.new(1, -62, 0, 0)
+ARBtn.Text = "⏱️ Auto: OFF"
+ARBtn.TextColor3 = Cores.Texto
+ARBtn.TextSize = 8
+ARBtn.Font = Enum.Font.GothamBold
+ARBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+ARBtn.BorderSizePixel = 0
+ARBtn.Parent = ARRow
+local arbc = Instance.new("UICorner") arbc.CornerRadius = UDim.new(0, 4) arbc.Parent = ARBtn
+
+ARBtn.MouseButton1Click:Connect(function()
+    AutoRefreshOn = not AutoRefreshOn
+    if AutoRefreshOn then
+        ARBtn.Text = "⏱️ Auto: ON"
+        ARBtn.BackgroundColor3 = GetBorda()
+        ARBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+    else
+        ARBtn.Text = "⏱️ Auto: OFF"
+        ARBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+        ARBtn.TextColor3 = Cores.Texto
+    end
+end)
+
+-- Lista
+local SL = Instance.new("ScrollingFrame")
+SL.Size = UDim2.new(1, -8, 1, -138)
+SL.Position = UDim2.new(0, 4, 0, 114)
+SL.BackgroundColor3 = Color3.fromRGB(12, 12, 15)
+SL.BorderSizePixel = 0
+SL.ScrollBarThickness = 3
+SL.ScrollBarImageColor3 = GetBorda()
+SL.AutomaticCanvasSize = Enum.AutomaticSize.Y
+SL.CanvasSize = UDim2.new(0, 0, 0, 0)
+SL.Parent = C1
+local slc = Instance.new("UICorner") slc.CornerRadius = UDim.new(0, 5) slc.Parent = SL
+
+-- LIVE PANEL
+local LF = Instance.new("Frame")
+LF.Size = UDim2.new(0, 150, 0, 72)
+LF.Position = UDim2.new(1, -160, 0, 8)
+LF.BackgroundColor3 = Cores.Fundo
+LF.BackgroundTransparency = 0.15
+LF.BorderSizePixel = 0
+LF.Parent = SG
+local lfc = Instance.new("UICorner") lfc.CornerRadius = UDim.new(0, 6) lfc.Parent = LF
+local lfs = Instance.new("UIStroke") lfs.Thickness = 1.5 lfs.Color = GetBorda() lfs.Parent = LF
+
+local function mkLive(t, y)
+    local l = Instance.new("TextLabel")
+    l.Size = UDim2.new(1, -10, 0, 16)
+    l.Position = UDim2.new(0, 5, 0, y)
+    l.Text = t
+    l.TextColor3 = Cores.Texto
+    l.TextSize = 10
+    l.Font = Enum.Font.GothamBold
+    l.TextXAlignment = Enum.TextXAlignment.Left
+    l.BackgroundTransparency = 1
+    l.Parent = LF
+    return l
+end
+
+local LT = mkLive("⏱️ 0s", 5)
+local LP = mkLive("👥 0", 22)
+local LG = mkLive("📡 --", 39)
+
+-- VARIÁVEIS
+local CurId = game.JobId
+local Favs = {}
+local Hist = {}
+local TempoIni = tick()
+local FiltroMinPlayers = 0
+local FiltroMaxPlayers = 100
+local UltimoRefreshAuto = tick()
+
+local function limpar(p)
+    for _, v in pairs(p:GetChildren()) do
+        if v:IsA("Frame") then v:Destroy() end
+    end
+end
+
+local function fmtT(s)
+    local m = math.floor(s / 60)
+    local sec = math.floor(s % 60)
+    if m > 0 then return m .. "m " .. sec .. "s" end
+    return sec .. "s"
+end
+
+local function pingAtual()
+    local ok, p = pcall(function()
+        return Stats.Network.ServerStatsItem["Data Ping"]:GetValue()
+    end)
+    if ok and p then return math.floor(p) end
+    return 0
+end
+
+local function tp(sv)
+    if not sv then return end
+    table.insert(Hist, 1, { id = sv.id, playing = sv.playing, maxPlayers = sv.maxPlayers })
+    while #Hist > 15 do table.remove(Hist) end
+    pcall(function()
+        TS:TeleportToPlaceInstance(game.PlaceId, sv.id, PL.LocalPlayer)
+    end)
+end
+
+local function criarLinha(sv, parent, y, tipo)
+    tipo = tipo or "server"
+    local ehBom = (sv.playing <= 3)
+    local L = Instance.new("Frame")
+    L.Size = UDim2.new(1, -4, 0, 44)
+    L.Position = UDim2.new(0, 2, 0, y)
+    L.BackgroundColor3 = ehBom and Color3.fromRGB(15, 30, 20) or Cores.Painel
+    L.BorderSizePixel = 0
+    L.Parent = parent
+    local lc = Instance.new("UICorner") lc.CornerRadius = UDim.new(0, 5) lc.Parent = L
+    local ls = Instance.new("UIStroke")
+    ls.Thickness = ehBom and 2 or 1
+    ls.Color = ehBom and Color3.fromRGB(0, 255, 120) or Color3.fromRGB(30, 30, 40)
+    ls.Parent = L
+
+    local D = Instance.new("Frame")
+    D.Size = UDim2.new(0, 7, 0, 7)
+    D.Position = UDim2.new(0, 6, 0, 6)
+    D.BorderSizePixel = 0
+    D.Parent = L
+    local dc = Instance.new("UICorner") dc.CornerRadius = UDim.new(1, 0) dc.Parent = D
+    local pr = (sv.playing or 0) / (sv.maxPlayers or 1)
+    if pr < 0.25 then D.BackgroundColor3 = GetBorda()
+    elseif pr < 0.6 then D.BackgroundColor3 = Cores.Amarelo
+    else D.BackgroundColor3 = Cores.Vermelho end
+
+    local P1 = Instance.new("TextLabel")
+    P1.Size = UDim2.new(0, 110, 0, 14)
+    P1.Position = UDim2.new(0, 18, 0, 3)
+    P1.Text = (ehBom and "✨ " or "👥 ") .. (sv.playing or 0) .. "/" .. (sv.maxPlayers or 0)
+    P1.TextColor3 = Cores.Texto
+    P1.TextSize = 10
+    P1.Font = Enum.Font.GothamBold
+    P1.TextXAlignment = Enum.TextXAlignment.Left
+    P1.BackgroundTransparency = 1
+    P1.Parent = L
+
+    local P2 = Instance.new("TextLabel")
+    P2.Size = UDim2.new(0, 110, 0, 12)
+    P2.Position = UDim2.new(0, 18, 0, 17)
+    P2.Text = "🆔 " .. string.sub(sv.id, 1, 12) .. "..."
+    P2.TextColor3 = Cores.Cinza
+    P2.TextSize = 8
+    P2.Font = Enum.Font.Gotham
+    P2.TextXAlignment = Enum.TextXAlignment.Left
+    P2.BackgroundTransparency = 1
+    P2.Parent = L
+
+    local EB = Instance.new("TextButton")
+    EB.Size = UDim2.new(0, 42, 0, 22)
+    EB.Position = UDim2.new(1, -96, 0, 11)
+    EB.Text = "Entrar"
+    EB.TextColor3 = Color3.fromRGB(0, 0, 0)
+    EB.TextSize = 9
+    EB.Font = Enum.Font.GothamBold
+    EB.BackgroundColor3 = GetBorda()
+    EB.BorderSizePixel = 0
+    EB.Parent = L
+    local ebc = Instance.new("UICorner") ebc.CornerRadius = UDim.new(0, 4) ebc.Parent = EB
+    EB.MouseButton1Click:Connect(function() tp(sv) end)
+
+    local CBtn = Instance.new("TextButton")
+    CBtn.Size = UDim2.new(0, 22, 0, 22)
+    CBtn.Position = UDim2.new(1, -50, 0, 11)
+    CBtn.Text = "📋"
+    CBtn.TextColor3 = Cores.Texto
+    CBtn.TextSize = 10
+    CBtn.Font = Enum.Font.GothamBold
+    CBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+    CBtn.BorderSizePixel = 0
+    CBtn.Parent = L
+    local cbc = Instance.new("UICorner") cbc.CornerRadius = UDim.new(0, 4) cbc.Parent = CBtn
+    CBtn.MouseButton1Click:Connect(function()
+        pcall(function()
+            if setclipboard then setclipboard(sv.id) end
+        end)
+        CBtn.Text = "✅"
+        task.wait(1)
+        CBtn.Text = "📋"
+    end)
+
+    if tipo == "server" then
+        local FB = Instance.new("TextButton")
+        FB.Size = UDim2.new(0, 22, 0, 22)
+        FB.Position = UDim2.new(1, -26, 0, 11)
+        FB.Text = "⭐"
+        FB.TextColor3 = Cores.Amarelo
+        FB.TextSize = 11
+        FB.Font = Enum.Font.GothamBold
+        FB.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+        FB.BorderSizePixel = 0
+        FB.Parent = L
+        local fbc = Instance.new("UICorner") fbc.CornerRadius = UDim.new(0, 4) fbc.Parent = FB
+        FB.MouseButton1Click:Connect(function()
+            local existe = false
+            for _, f in ipairs(Favs) do
+                if f.id == sv.id then existe = true break end
+            end
+            if not existe then
+                table.insert(Favs, { id = sv.id, playing = sv.playing, maxPlayers = sv.maxPlayers })
+                FB.Text = "✅"
+            else
+                FB.Text = "✅"
+            end
+            task.wait(1)
+            FB.Text = "⭐"
+        end)
+    end
+
+    if tipo == "fav" then
+        local DB = Instance.new("TextButton")
+        DB.Size = UDim2.new(0, 22, 0, 22)
+        DB.Position = UDim2.new(1, -26, 0, 11)
+        DB.Text = "🗑"
+        DB.TextColor3 = Cores.Vermelho
+        DB.TextSize = 10
+        DB.Font = Enum.Font.GothamBold
+        DB.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+        DB.BorderSizePixel = 0
+        DB.Parent = L
+        local dbc = Instance.new("UICorner") dbc.CornerRadius = UDim.new(0, 4) dbc.Parent = DB
+        DB.MouseButton1Click:Connect(function()
+            for i, f in ipairs(Favs) do
+                if f.id == sv.id then table.remove(Favs, i) break end
+            end
+            attFavs()
+        end)
+    end
+
+    if tipo == "hist" then
+        local VB = Instance.new("TextButton")
+        VB.Size = UDim2.new(0, 45, 0, 22)
+        VB.Position = UDim2.new(1, -49, 0, 11)
+        VB.Text = "🔙 Voltar"
+        VB.TextColor3 = Color3.fromRGB(0, 0, 0)
+        VB.TextSize = 8
+        VB.Font = Enum.Font.GothamBold
+        VB.BackgroundColor3 = Color3.fromRGB(100, 200, 255)
+        VB.BorderSizePixel = 0
+        VB.Parent = L
+        local vbc = Instance.new("UICorner") vbc.CornerRadius = UDim.new(0, 4) vbc.Parent = VB
+        VB.MouseButton1Click:Connect(function() tp(sv) end)
+    end
+end
+
+function attFavs()
+    for _, v in pairs(C2:GetChildren()) do
+        if v:IsA("ScrollingFrame") then v:Destroy() end
+    end
+    local S = Instance.new("ScrollingFrame")
+    S.Size = UDim2.new(1, -8, 1, -8)
+    S.Position = UDim2.new(0, 4, 0, 4)
+    S.BackgroundTransparency = 1
+    S.BorderSizePixel = 0
+    S.ScrollBarThickness = 3
+    S.ScrollBarImageColor3 = GetBorda()
+    S.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    S.CanvasSize = UDim2.new(0, 0, 0, 0)
+    S.Parent = C2
+    if #Favs == 0 then
+        local l = Instance.new("TextLabel")
+        l.Size = UDim2.new(1, 0, 0, 30)
+        l.Position = UDim2.new(0, 0, 0, 10)
+        l.Text = "Nenhum favorito."
+        l.TextColor3 = Cores.Cinza
+        l.TextSize = 10
+        l.Font = Enum.Font.Gotham
+        l.BackgroundTransparency = 1
+        l.Parent = S
+        return
+    end
+    local y = 4
+    for _, f in ipairs(Favs) do
+        criarLinha(f, S, y, "fav")
+        y = y +
